@@ -22,8 +22,10 @@
  * - keypress in any window
  * start action on startup
  *
+ *
  * strange:
  *      updateVideoFrame called without AVPlayerLayer (which shouldn't happen
+ *
  */
 #endif // TODO
 

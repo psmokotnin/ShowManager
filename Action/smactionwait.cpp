@@ -29,7 +29,10 @@ void SMActionWait::go()
     {
         SMAction::go();
         _currentTime = 0;
-        _timer->start(_timeStep);
+        if (waitTime() > 0)
+            _timer->start(_timeStep);
+        else
+            emit end(this);
     }
 }
 void SMActionWait::slotSetTime(void)
