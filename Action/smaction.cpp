@@ -58,6 +58,11 @@ void SMAction::setTitle(QString title)
 {
     ui->title->setText(title);
 }
+void SMAction::setShortKey(QString key)
+{
+    _shortKey = key;
+    emit keySetted(this);
+}
 QString SMAction::title(void)
 {
     return ui->title->text();
@@ -283,13 +288,20 @@ void SMAction::stop(void)
 {
     //qInfo() << "STOP " << title();
     setStatus(STATUS_STOP);
+    emit stopped(this);
 }
 void SMAction::onEnd()
 {
     //qInfo() << "onEnd " << title();
-    setStatus(STATUS_STOP);
-    if (getGoType() == GOTYPE_NEXTONEND)
-        emit goNext(this);
+    /*
+     * don't go next if already stopped
+     */
+    if (getStatus() != STATUS_STOP)
+    {
+        setStatus(STATUS_STOP);
+        if (getGoType() == GOTYPE_NEXTONEND)
+            emit goNext(this);
+    }
 }
 bool SMAction::keyPressed(QString key)
 {

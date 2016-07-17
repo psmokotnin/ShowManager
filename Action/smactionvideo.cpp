@@ -2,9 +2,13 @@
 
 using namespace QtAV;
 
+//"invalid video frame from decoder. undecoded data size: 0"
+//"no frame could be decompressed: Error number 5657 occurred 0/5657"
+
 SMActionVideo::SMActionVideo(QWidget *parent):
     SMAction(parent)
 {
+    //QtAV::setLogLevel(LogLevel::LogAll);
     mediaDuration     = 0;
     _goOnLoad         = false;
     _goDisabled       = false;
@@ -61,24 +65,29 @@ void SMActionVideo::load(int time)
     AVmediaPlayer.setPosition(0);
 }
 void SMActionVideo::go(void)
-{
+{qInfo() << "GO! " << title();
+    if (getStatus() == STATUS_PLAY)
+        return;
+
     if (!isLoaded())
     {
         _goOnLoad = true;
         load();
         return;
     }
-    preGo();
+
     _goOnLoad = false;
     if (getStatus() == STATUS_ERROR)
         return;
 
     //wait for stopping process end
     if (isGoDisabled())
-    {
+    {qInfo() << "GO disabled.";
         _goOnStopped = true;
         return;
     }
+
+    preGo();
     if (!AVideoItem->scene())
         view()->scene()->addItem(AVideoItem);
 
@@ -87,10 +96,14 @@ void SMActionVideo::go(void)
         AVmediaPlayer.setRepeat(repeat());
         setDisableStop(true);
         AVmediaPlayer.play();
+        qInfo() << "send player go " << title();
     }
 }
 void SMActionVideo::stop(void)
-{
+{qInfo() << "STOP " <<title();
+    if (getStatus() == STATUS_STOP)
+        return;
+
     _goOnLoad = false;
 
     if (isStopDisabled())
@@ -101,13 +114,16 @@ void SMActionVideo::stop(void)
 
     if (AVmediaPlayer.isPlaying())
     {
+        setDisableGo(true);
         AVmediaPlayer.setRepeat(0);//disable repeat for stoping
         AVmediaPlayer.stop();
         //now wait for signal and return to else
+        qInfo() << "send player stop";
     }
     else
     {
         SMAction::stop();
+        qInfo() << "remove item";
         if (view() && AVideoItem->scene())
             view()->scene()->removeItem(AVideoItem);
     }
@@ -132,14 +148,14 @@ void SMActionVideo::disconnectPlayer()
 }
 void SMActionVideo::playerStop()
 {
-    setDisableGo(false);
-
     stop();
+
+    setDisableGo(false);
 
     if (_emitEndOnStopped)
     {
         _emitEndOnStopped = false;
-        emit end(this);
+        {emit end(this);qInfo() << "END 1";}
     }
 
     if (_goOnStopped)
@@ -151,6 +167,7 @@ void SMActionVideo::playerStop()
 void SMActionVideo::playerStarted()
 {
     setDisableStop(false);
+    _emitEndOnStopped = false;
     if (_stopOnStarted)
     {
         _stopOnStarted = false;
@@ -158,11 +175,11 @@ void SMActionVideo::playerStarted()
     }
 }
 void SMActionVideo::positionChanged(qint64 position)
-{
+{qInfo() << "position " << title() << " " << position << " " << mediaDuration;
     qint64 percent = (100 * position) / mediaDuration;
     getProgressBar()->setValue((int)percent);
     if (position >= mediaDuration)
-        emit end(this);
+    {emit end(this);qInfo() << "END 2";}
 }
 void SMActionVideo::durationChanged(qint64 duration)
 {
@@ -199,13 +216,14 @@ void SMActionVideo::mediaStatusChanged(QtAV::MediaStatus status)
     case QtAV::MediaStatus::EndOfMedia:
         if (AVmediaPlayer.duration() == 0)
             break; //is not end of media, it's stop media
+        qInfo() << "EoM " << AVmediaPlayer.duration() << " " << AVmediaPlayer.position() << " " << getStatus();
         if (getStatus() == STATUS_PLAY)
         {
             setDisableGo(true);
             _emitEndOnStopped = true;
         }
         else
-            emit end(this);
+            {emit end(this);qInfo() << "END 3";}
         break;
     }
 
@@ -224,7 +242,7 @@ void SMActionVideo::setVolume(qreal v)
         AVmediaPlayer.audio()->setVolume(volume());
 }
 void SMActionVideo::onEnd()
-{
+{qInfo() << "onEND" << title();
     getProgressBar()->setValue(getProgressBar()->maximum());
 
     //if (view() && AVideoItem->scene())

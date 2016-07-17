@@ -22,6 +22,7 @@ public slots:
     virtual void go();
     void slotSetActionId(void);
     virtual void load(int time = 0) {SMAction::load(time); _loaded = true;}
+    void actionStopped(SMAction *stoppedAction);
 };
 
 #endif // SMACTIONSTOP_H

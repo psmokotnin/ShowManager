@@ -48,7 +48,7 @@ public:
     virtual void setTitle(QString title);
     QString title(void);
 
-    void setShortKey(QString key) {_shortKey = key;}
+    void setShortKey(QString key);
     QString shortKey(void) {return _shortKey;}
 
     virtual void setMedia(QString fileName);
@@ -128,9 +128,12 @@ protected slots:
 
 signals:
     void removeItem(SMAction* a);
+    void stopped(SMAction* a);
     void goNext(SMAction* a);
     void end(SMAction* a);
     void loadNext(SMAction* a);
+
+    void keySetted(SMAction* a);
 };
 
 #endif // SMACTION_H

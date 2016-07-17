@@ -20,15 +20,15 @@ void SMActionStop::setActionId(int id)
 void SMActionStop::go()
 {
     SMAction::go();
+    bool emitEnd = true;
     if (actionId() > 0)
     {
-        if (actionId() > 0)
+        SMAction* action = getActionList()->getActionById(actionId());
+        if (action && action != this && action->getStatus() != STATUS_STOP)
         {
-            SMAction* action = getActionList()->getActionById(actionId());
-            if (action)
-            {
-                action->stop();
-            }
+            emitEnd = false;
+            connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+            action->stop();
         }
     }
     else if (actionId() == -1)
@@ -37,15 +37,47 @@ void SMActionStop::go()
         for (int i = 0; i < getActionList()->count(); i++)
         {
             SMAction* action = getActionList()->getActionItem(i);
-            if (action)
+            if (action && action != this && action->getStatus() != STATUS_STOP)
             {
+                qInfo() << "wait for stop " << action->getId() << " " << action->title();
+                emitEnd = false;
+                connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
                 action->stop();
             }
         }
     }
     getProgressBar()->setValue(100);
-    emit end(this);
+    if (emitEnd)
+        emit end(this);
 }
+/**
+ * @brief SMActionStop::actionStopped
+ * @param stoppedAction
+ *
+ * send end signal when all actions is stopped
+ */
+void SMActionStop::actionStopped(SMAction *stoppedAction)
+{
+    disconnect(stoppedAction, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+    if (actionId() > 0)
+    {
+        emit end(this);
+    }
+    else if (actionId() == -1)
+    {
+        //all
+        for (int i = 0; i < getActionList()->count(); i++)
+        {
+            SMAction* action = getActionList()->getActionItem(i);
+            if (action && action != this && action->getStatus() != STATUS_STOP)
+            {
+                return;
+            }
+        }
+        emit end(this);
+    }
+}
+
 void SMActionStop::slotSetActionId(void)
 {
     bool ok;

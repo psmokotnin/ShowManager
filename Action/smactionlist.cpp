@@ -80,6 +80,8 @@ void SMActionList::addAction(SMAction* action)
     connect(action, SIGNAL(removeItem(SMAction*)), SLOT(removeSMAction(SMAction*)));
     connect(action, SIGNAL(goNext(SMAction*)), SLOT(goNext(SMAction*)));
     connect(action, SIGNAL(loadNext(SMAction*)), SLOT(loadNext(SMAction*)));
+    connect(action, SIGNAL(keySetted(SMAction*)), SLOT(keySetted(SMAction*)));
+    action->keySetted(action);
 }
 SMAction* SMActionList::getActionById(int id)
 {
@@ -182,19 +184,19 @@ void SMActionList::keyPressEvent(QKeyEvent *keyEvent)
 {
     if (keyEvent->modifiers() == Qt::NoModifier)
     {
-        for (int i = 0; i < count(); i++)
-        {
-            SMAction* a = getActionItem(i);
-            if (a && !_keyTimer->isActive())
-                if (a->keyPressed(keyEvent->text()))
-                {
-                    _keyTimer->start(2000);//disable events for 2 sec
-                }
-        }
+        emit keyPressed(keyEvent->text());
+        _keyTimer->start(500);//disable events for 2 sec
     }
     QListWidget::keyPressEvent(keyEvent);
 }
 void SMActionList::slotKeyTimeout()
-{qInfo() << "timer key";
+{
     _keyTimer->stop();
+}
+void SMActionList::keySetted(SMAction* a)
+{qInfo() << "key setted " << a->title();
+    if (!a->shortKey().isEmpty())
+        connect(this, SIGNAL(keyPressed(QString)), a, SLOT(keyPressed(QString)));
+    else
+        disconnect(this, SIGNAL(keyPressed(QString)), a, SLOT(keyPressed(QString)));
 }

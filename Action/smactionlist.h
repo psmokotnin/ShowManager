@@ -42,6 +42,7 @@ public:
     virtual void keyPressEvent(QKeyEvent *keyEvent);
 
 signals:
+    void keyPressed(QString key);
 
 public slots:
     void addVideoActionMenu(QString file = NULL);
@@ -57,6 +58,7 @@ public slots:
     void loadNext(SMAction* a);
     void stopAll(void);
     void stopSelected(void);
+    void keySetted(SMAction* a);
 
 protected slots:
     void slotKeyTimeout(void);

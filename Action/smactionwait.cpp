@@ -35,6 +35,12 @@ void SMActionWait::go()
             emit end(this);
     }
 }
+void SMActionWait::stop()
+{
+    SMAction::stop();
+    _timer->stop();
+}
+
 void SMActionWait::slotSetTime(void)
 {
     bool ok;

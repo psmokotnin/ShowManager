@@ -28,6 +28,7 @@ protected slots:
 
 public slots:
     virtual void go();
+    virtual void stop();
     virtual void slotSetTime(void);
     virtual void load(int time = 0) {SMAction::load(time); _loaded = true;}
 };

@@ -8,6 +8,5 @@ SMActionEmpty::SMActionEmpty(QWidget *parent):
 void SMActionEmpty::go(void)
 {
     SMAction::go();
-    setStatus(STATUS_STOP);
     emit end(this);
 }
