@@ -37,8 +37,8 @@ void SMActionWait::go()
 }
 void SMActionWait::stop()
 {
-    SMAction::stop();
     _timer->stop();
+    SMAction::stop();
 }
 
 void SMActionWait::slotSetTime(void)

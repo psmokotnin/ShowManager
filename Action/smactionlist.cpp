@@ -194,7 +194,7 @@ void SMActionList::slotKeyTimeout()
     _keyTimer->stop();
 }
 void SMActionList::keySetted(SMAction* a)
-{qInfo() << "key setted " << a->title();
+{
     if (!a->shortKey().isEmpty())
         connect(this, SIGNAL(keyPressed(QString)), a, SLOT(keyPressed(QString)));
     else
