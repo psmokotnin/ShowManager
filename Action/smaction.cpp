@@ -102,7 +102,19 @@ QProgressBar* SMAction::getProgressBar(void)
 void SMAction::setStatus(int status)
 {
     _status = status;
-    ui->status->setText(QString::number(getStatus()));
+    //ui->status->setText(QString::number(getStatus()));
+    QPixmap p; // load pixmap
+    int w = ui->status->width();
+    int h = ui->status->height();
+    switch (getStatus())
+    {
+    case STATUS_PLAY:
+        p.load("://Images/playAction.png");
+        ui->status->setPixmap(p.scaled(w / 2, h / 2, Qt::KeepAspectRatio));
+        break;
+    default:
+        ui->status->setText(QString::number(getStatus()));
+    }
 }
 SMAction::~SMAction()
 {

@@ -54,3 +54,8 @@ void MainWindow::keyPressEvent(QKeyEvent *keyEvent)
     getListWidget()->keyPressEvent(keyEvent);
     QMainWindow::keyPressEvent(keyEvent);
 }
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    Q_UNUSED(event);
+    qApp->exit();
+}

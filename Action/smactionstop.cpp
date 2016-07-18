@@ -43,6 +43,11 @@ void SMActionStop::go()
                 emitEnd = false;
                 connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
                 action->stop();
+
+                if (action->getStatus() == STATUS_STOP)
+                {
+                    actionStopped(action);
+                }
             }
         }
     }
@@ -50,6 +55,12 @@ void SMActionStop::go()
     if (emitEnd)
         emit end(this);
 }
+void SMActionStop::stop()
+{
+    disconnect(SIGNAL(stopped(SMAction*)), this);
+    SMAction::stop();
+}
+
 /**
  * @brief SMActionStop::actionStopped
  * @param stoppedAction

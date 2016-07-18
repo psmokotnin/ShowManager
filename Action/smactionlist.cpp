@@ -182,10 +182,10 @@ SMAction* SMActionList::getActionItem(int i)
  */
 void SMActionList::keyPressEvent(QKeyEvent *keyEvent)
 {
-    if (keyEvent->modifiers() == Qt::NoModifier)
+    if (keyEvent->modifiers() == Qt::NoModifier && !_keyTimer->isActive())
     {
         emit keyPressed(keyEvent->text());
-        _keyTimer->start(500);//disable events for 2 sec
+        _keyTimer->start(500);//disable events for 1/2 sec
     }
     QListWidget::keyPressEvent(keyEvent);
 }

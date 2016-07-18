@@ -22,6 +22,7 @@ public:
 
 protected:
     virtual void keyPressEvent(QKeyEvent *keyEvent);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void on_actionSave_triggered();
