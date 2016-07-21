@@ -184,8 +184,9 @@ void SMActionList::keyPressEvent(QKeyEvent *keyEvent)
 {
     if (keyEvent->modifiers() == Qt::NoModifier && !_keyTimer->isActive())
     {
+        _keyTimer->start(1000);//disable events for 1/2 sec
+        qInfo() << "key pressed " << keyEvent->text();
         emit keyPressed(keyEvent->text());
-        _keyTimer->start(500);//disable events for 1/2 sec
     }
     QListWidget::keyPressEvent(keyEvent);
 }

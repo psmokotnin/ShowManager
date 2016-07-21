@@ -30,7 +30,7 @@ void SMActionVideoNative::load(int time)
     {
         SMAction::load(time);
         mediaPlayer->setMedia(mediaUrl());
-        _loaded = true;
+        setLoadStatus(STATUS_LOADED);
     }
 }
 void SMActionVideoNative::go(void)

@@ -8,57 +8,79 @@ SMActionStop::SMActionStop(QWidget *parent):
     QAction* selectActionAction = getContextMenu()->addAction("set action id");
     connect(selectActionAction, SIGNAL(triggered(bool)), SLOT(slotSetActionId()));
 }
+SMActionStop::~SMActionStop()
+{
+
+}
 
 void SMActionStop::setActionId(int id)
 {
     _actionId = id;
+    disconnect(SIGNAL(stopped(SMAction*)), this);
     if (id > 0)
+    {
         setTitle("Stop action #" + QString::number(id));
+        SMAction* action = getActionList()->getActionById(actionId());
+        connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+    }
     else if (id == -1)
+    {
         setTitle("Stop all actions");
+        for (int i = 0; i < getActionList()->count(); i++)
+        {
+            SMAction* action = getActionList()->getActionItem(i);
+            if (action && action != this)
+            {
+                connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+            }
+        }
+    }
 }
 void SMActionStop::go()
 {
+    bool endImmediately = true;
     SMAction::go();
-    bool emitEnd = true;
+    getProgressBar()->setValue(0);
+
     if (actionId() > 0)
     {
         SMAction* action = getActionList()->getActionById(actionId());
         if (action && action != this && action->getStatus() != STATUS_STOP)
         {
-            emitEnd = false;
-            connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+            endImmediately = false;
             action->stop();
         }
     }
     else if (actionId() == -1)
-    {
+    {qInfo() << "STOP ALLL GO " << getId();
+        getProgressBar()->setValue(50);
         //all
         for (int i = 0; i < getActionList()->count(); i++)
         {
             SMAction* action = getActionList()->getActionItem(i);
             if (action && action != this && action->getStatus() != STATUS_STOP)
             {
-                qInfo() << "wait for stop " << action->getId() << " " << action->title();
-                emitEnd = false;
-                connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+                endImmediately = false;
+                qInfo() << "    wait for stop " << action->getId() << " " << action->title() << " status: " << action->getStatus();
                 action->stop();
-
-                if (action->getStatus() == STATUS_STOP)
-                {
-                    actionStopped(action);
-                }
             }
+            if (getStatus() == STATUS_STOP)
+                break;
         }
     }
-    getProgressBar()->setValue(100);
-    if (emitEnd)
+    if (endImmediately)
+    {
         emit end(this);
+    }
 }
 void SMActionStop::stop()
-{
-    disconnect(SIGNAL(stopped(SMAction*)), this);
+{qInfo() << "        STOP " << getId();
     SMAction::stop();
+}
+void SMActionStop::onEnd()
+{
+    getProgressBar()->setValue(100);
+    SMAction::onEnd();
 }
 
 /**
@@ -68,9 +90,12 @@ void SMActionStop::stop()
  * send end signal when all actions is stopped
  */
 void SMActionStop::actionStopped(SMAction *stoppedAction)
-{
-    disconnect(stoppedAction, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
-    if (actionId() > 0)
+{qInfo() << "        slot actionStopped " << getId() << " " << stoppedAction->getId();
+    if (getStatus() != STATUS_PLAY)
+        return;
+
+    qInfo() << "        slot stopped " << stoppedAction->getId() << " " << stoppedAction->title();
+    if (actionId() > 0 && actionId() == stoppedAction->getId() && stoppedAction->getStatus() == STATUS_STOP)
     {
         emit end(this);
     }
@@ -80,8 +105,9 @@ void SMActionStop::actionStopped(SMAction *stoppedAction)
         for (int i = 0; i < getActionList()->count(); i++)
         {
             SMAction* action = getActionList()->getActionItem(i);
-            if (action && action != this && action->getStatus() != STATUS_STOP)
-            {
+            if (action && (action != this) && (action->getStatus() != STATUS_STOP))
+            {qInfo() << "           still wait for " << action->getId() << " " << action->title();
+                action->stop();
                 return;
             }
         }

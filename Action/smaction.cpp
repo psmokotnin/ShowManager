@@ -15,7 +15,7 @@ SMAction::SMAction(QWidget *parent) :
 
     setupList();
 
-    _loaded = false;
+    _loadStatus = STATUS_NOTLOADED;
     setId(0);
     setView(0);
     setViewId(0);
@@ -69,7 +69,7 @@ QString SMAction::title(void)
 }
 void SMAction::setMedia(QString name)
 {
-    _loaded = false;
+    _loadStatus = STATUS_NOTLOADED;
     this->fileName = name;
     if (ui->title->text().length() == 0)
     {
@@ -100,7 +100,10 @@ QProgressBar* SMAction::getProgressBar(void)
     return ui->progressBar;
 }
 void SMAction::setStatus(int status)
-{
+{qInfo() << "setStatus " << status << " " << getId();
+    //if (_status == status)
+    //    return ;
+
     _status = status;
     //ui->status->setText(QString::number(getStatus()));
     QPixmap p; // load pixmap
@@ -111,6 +114,13 @@ void SMAction::setStatus(int status)
     case STATUS_PLAY:
         p.load("://Images/playAction.png");
         ui->status->setPixmap(p.scaled(w / 2, h / 2, Qt::KeepAspectRatio));
+        break;
+    case STATUS_STOP:
+        qInfo() << "stopped " << getId() << " " << title();
+        emit stopped(this);
+        ui->status->setText(QString::number(getStatus()));
+        //p.load("://Images/stopAction.png");
+        //ui->status->setPixmap(p.scaled(w / 2, h / 2, Qt::KeepAspectRatio));
         break;
     default:
         ui->status->setText(QString::number(getStatus()));
@@ -282,12 +292,12 @@ void SMAction::preGo()
 }
 void SMAction::go(void)
 {
-    //qInfo() << "GO " << title();
+    setStatus(STATUS_PLAY);
+    qInfo() << "GO " << getId() << " " << title();
     if (!isLoaded())
         load();
 
     preGo();
-    setStatus(STATUS_PLAY);
 }
 void SMAction::load(int time)
 {
@@ -298,12 +308,11 @@ void SMAction::load(int time)
 }
 void SMAction::stop(void)
 {
-    //qInfo() << "STOP " << title();
+    qInfo() << "STOP " << getId() << " " << title();
     setStatus(STATUS_STOP);
-    emit stopped(this);
 }
 void SMAction::onEnd()
-{
+{qInfo() << "onEnd " << getId() << " " << title();
     //qInfo() << "onEnd " << title();
     /*
      * don't go next if already stopped

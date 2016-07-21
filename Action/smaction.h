@@ -33,6 +33,7 @@ public:
     const static int GOTYPE_NEXTONEND = 2;
 
     const static int STATUS_STOP          = 0;
+    const static int STATUS_NOTLOADED     = 0;
     const static int STATUS_LOADING       = 1;
     const static int STATUS_LOADED        = 2;
     const static int STATUS_PLAY          = 3;
@@ -61,7 +62,7 @@ public:
 
     virtual QString type(void) {return "Abstract";};
 
-    bool isLoaded(void) {return _loaded;}
+    bool isLoaded(void) {return _loadStatus == STATUS_LOADED;}
     int getGoType() {return _goType;}
     void setGoType(int type);
 
@@ -80,13 +81,14 @@ protected:
         contextMenu->exec(pe->globalPos());
     }
     void setStatus(int status);
+    void setLoadStatus(int loadStatus) {_loadStatus = loadStatus;}
     virtual void setView(SMView* view);
     void preGo();
 
     SMActionList* getActionList() {return actionList;}
     QMenu* getContextMenu() {return contextMenu;}
 
-    bool _loaded;
+    int _loadStatus;
     int _goType;
     int _status;
     int _viewId;

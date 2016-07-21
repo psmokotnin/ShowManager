@@ -191,12 +191,11 @@ void SMActionVideo::mediaStatusChanged(QtAV::MediaStatus status)
     {
     case QtAV::MediaStatus::LoadingMedia:
         //_loaded = false;
-        setStatus(STATUS_LOADING);
+        setLoadStatus(STATUS_LOADING);
         break;
 
     case QtAV::MediaStatus::LoadedMedia:
-        _loaded = true;
-        setStatus(STATUS_LOADED);
+        setLoadStatus(STATUS_LOADED);
         if (_goOnLoad)
             go();
         break;
@@ -208,7 +207,7 @@ void SMActionVideo::mediaStatusChanged(QtAV::MediaStatus status)
 
     case QtAV::MediaStatus::NoMedia:
     case QtAV::MediaStatus::InvalidMedia:
-        _loaded = false;
+        setLoadStatus(STATUS_NOTLOADED);
         setStatus(STATUS_ERROR);
         qInfo() << "ERROR!!!! " << title();
         break;
