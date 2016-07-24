@@ -10,22 +10,43 @@ SMActionStop::SMActionStop(QWidget *parent):
 }
 SMActionStop::~SMActionStop()
 {
-
+    disconnectActions();
 }
 
 void SMActionStop::setActionId(int id)
 {
     _actionId = id;
-    disconnect(SIGNAL(stopped(SMAction*)), this);
+    //disconnect(SIGNAL(stopped(SMAction*)), this);
+    disconnectActions();
     if (id > 0)
     {
         setTitle("Stop action #" + QString::number(id));
-        SMAction* action = getActionList()->getActionById(actionId());
-        connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+        //SMAction* action = getActionList()->getActionById(actionId());
+        //connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
     }
     else if (id == -1)
     {
         setTitle("Stop all actions");
+        /*for (int i = 0; i < getActionList()->count(); i++)
+        {
+            SMAction* action = getActionList()->getActionItem(i);
+            if (action && action != this)
+            {
+                connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+            }
+        }*/
+    }
+}
+void SMActionStop::connectActions()
+{
+    //disconnectActions();
+    if (actionId() > 0)
+    {
+        SMAction* action = getActionList()->getActionById(actionId());
+        connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
+    }
+    else if (actionId() == -1)
+    {
         for (int i = 0; i < getActionList()->count(); i++)
         {
             SMAction* action = getActionList()->getActionItem(i);
@@ -36,12 +57,18 @@ void SMActionStop::setActionId(int id)
         }
     }
 }
+
+void SMActionStop::disconnectActions()
+{
+    disconnect(SIGNAL(stopped(SMAction*)), this);
+}
+
 void SMActionStop::go()
 {
     bool endImmediately = true;
     SMAction::go();
     getProgressBar()->setValue(0);
-
+    connectActions();
     if (actionId() > 0)
     {
         SMAction* action = getActionList()->getActionById(actionId());
@@ -75,10 +102,12 @@ void SMActionStop::go()
 }
 void SMActionStop::stop()
 {qInfo() << "        STOP " << getId();
+    //disconnectActions();
     SMAction::stop();
 }
 void SMActionStop::onEnd()
 {
+    //disconnectActions();
     getProgressBar()->setValue(100);
     SMAction::onEnd();
 }

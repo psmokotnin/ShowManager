@@ -8,7 +8,8 @@ class SMActionStop : public SMAction
     Q_OBJECT
 
     int _actionId;
-
+    void connectActions();
+    void disconnectActions();
 
 public:
     SMActionStop(QWidget *parent = 0);
