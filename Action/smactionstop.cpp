@@ -16,30 +16,18 @@ SMActionStop::~SMActionStop()
 void SMActionStop::setActionId(int id)
 {
     _actionId = id;
-    //disconnect(SIGNAL(stopped(SMAction*)), this);
     disconnectActions();
     if (id > 0)
     {
         setTitle("Stop action #" + QString::number(id));
-        //SMAction* action = getActionList()->getActionById(actionId());
-        //connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
     }
     else if (id == -1)
     {
         setTitle("Stop all actions");
-        /*for (int i = 0; i < getActionList()->count(); i++)
-        {
-            SMAction* action = getActionList()->getActionItem(i);
-            if (action && action != this)
-            {
-                connect(action, SIGNAL(stopped(SMAction*)), this, SLOT(actionStopped(SMAction*)));
-            }
-        }*/
     }
 }
 void SMActionStop::connectActions()
 {
-    //disconnectActions();
     if (actionId() > 0)
     {
         SMAction* action = getActionList()->getActionById(actionId());
@@ -66,6 +54,7 @@ void SMActionStop::disconnectActions()
 void SMActionStop::go()
 {
     bool endImmediately = true;
+    getActionList()->setBusy(true);
     SMAction::go();
     getProgressBar()->setValue(0);
     connectActions();
@@ -79,7 +68,8 @@ void SMActionStop::go()
         }
     }
     else if (actionId() == -1)
-    {qInfo() << "STOP ALLL GO " << getId();
+    {
+        qInfo() << "STOP ALLL GO " << getId();
         getProgressBar()->setValue(50);
         //all
         for (int i = 0; i < getActionList()->count(); i++)
@@ -101,13 +91,14 @@ void SMActionStop::go()
     }
 }
 void SMActionStop::stop()
-{qInfo() << "        STOP " << getId();
-    //disconnectActions();
+{
+    qInfo() << "        STOP " << getId();
+    getActionList()->setBusy(false);
     SMAction::stop();
 }
 void SMActionStop::onEnd()
 {
-    //disconnectActions();
+    getActionList()->setBusy(false);
     getProgressBar()->setValue(100);
     SMAction::onEnd();
 }
@@ -119,7 +110,8 @@ void SMActionStop::onEnd()
  * send end signal when all actions is stopped
  */
 void SMActionStop::actionStopped(SMAction *stoppedAction)
-{qInfo() << "        slot actionStopped " << getId() << " " << stoppedAction->getId();
+{
+    qInfo() << "        slot actionStopped " << getId() << " " << stoppedAction->getId();
     if (getStatus() != STATUS_PLAY)
         return;
 

@@ -22,6 +22,8 @@ class SMActionList : public QListWidget
     SMApplication* application;
     QTimer* _keyTimer;
 
+    bool _busy;
+
 public:
     explicit SMActionList(QWidget *parent = 0);
     ~SMActionList();
@@ -36,6 +38,8 @@ public:
     SMAction* getActionById(int id);
     int calcNewId(void);
     int getMaxId(void);
+    void setBusy(bool busy){_busy = busy;}
+    bool isBusy(){return _busy;}
 
 
 public:

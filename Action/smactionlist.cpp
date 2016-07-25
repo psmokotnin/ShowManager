@@ -5,6 +5,7 @@
 SMActionList::SMActionList(QWidget *parent) : QListWidget(parent)
 {
     _keyTimer = new QTimer(this);
+    setBusy(false);
     connect(_keyTimer, SIGNAL(timeout()), SLOT(slotKeyTimeout()));
 }
 SMActionList::~SMActionList()
@@ -177,12 +178,10 @@ SMAction* SMActionList::getActionItem(int i)
 /**
  * @brief SMActionList::keyPressEvent
  * @param keyEvent
- *
- * TODO: rewrite to actionKeySlots and keyboard signals
  */
 void SMActionList::keyPressEvent(QKeyEvent *keyEvent)
 {
-    if (keyEvent->modifiers() == Qt::NoModifier && !_keyTimer->isActive())
+    if (keyEvent->modifiers() == Qt::NoModifier && !_keyTimer->isActive() && !isBusy())
     {
         _keyTimer->start(1000);//disable events for 1/2 sec
         qInfo() << "key pressed " << keyEvent->text();
