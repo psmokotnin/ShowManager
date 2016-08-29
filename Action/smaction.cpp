@@ -97,6 +97,7 @@ void SMAction::setGoType(int type)
     {
     case GOTYPE_NONE:
         ui->gotype->setText("");
+        ui->gotype->setPixmap(p);
         break;
     case GOTYPE_NEXTONGO:
         p.load("://Images/nextongo.png");
