@@ -1,11 +1,11 @@
-#include "smactionvideo.h"
+#include "smactionvideoqtav.h"
 
 using namespace QtAV;
 
 //"invalid video frame from decoder. undecoded data size: 0"
 //"no frame could be decompressed: Error number 5657 occurred 0/5657"
 
-SMActionVideo::SMActionVideo(QWidget *parent):
+SMActionVideoQtAV::SMActionVideoQtAV(QWidget *parent):
     SMAction(parent)
 {
     //QtAV::setLogLevel(LogLevel::LogAll);
@@ -35,13 +35,13 @@ SMActionVideo::SMActionVideo(QWidget *parent):
 
     connectPlayer();
 }
-SMActionVideo::~SMActionVideo()
+SMActionVideoQtAV::~SMActionVideoQtAV()
 {
     //if (AVmediaPlayer.isPlaying())
 //        AVmediaPlayer.stop();
     delete AVideoItem;
 }
-void SMActionVideo::setView(SMView* v)
+void SMActionVideoQtAV::setView(SMView* v)
 {
     if (view() && AVideoItem && AVideoItem->scene())
         view()->scene()->removeItem(AVideoItem);
@@ -51,7 +51,7 @@ void SMActionVideo::setView(SMView* v)
     AVideoItem->resizeRenderer(view()->size());
     view()->scene()->addItem(AVideoItem);
 }
-void SMActionVideo::load(int time)
+void SMActionVideoQtAV::load(int time)
 {
     SMAction::load(time);
 
@@ -64,7 +64,7 @@ void SMActionVideo::load(int time)
     }
     AVmediaPlayer.setPosition(0);
 }
-void SMActionVideo::go(void)
+void SMActionVideoQtAV::go(void)
 {qInfo() << "GO! " << title();
     if (getStatus() == STATUS_PLAY)
         return;
@@ -99,7 +99,7 @@ void SMActionVideo::go(void)
         qInfo() << "send player go " << title();
     }
 }
-void SMActionVideo::stop(void)
+void SMActionVideoQtAV::stop(void)
 {qInfo() << "STOP " <<title();
     if (getStatus() == STATUS_STOP)
         return;
@@ -128,11 +128,11 @@ void SMActionVideo::stop(void)
             view()->scene()->removeItem(AVideoItem);
     }
 }
-void SMActionVideo::setMedia(QString name)
+void SMActionVideoQtAV::setMedia(QString name)
 {
     SMAction::setMedia(name);
 }
-void SMActionVideo::connectPlayer()
+void SMActionVideoQtAV::connectPlayer()
 {
     connect(&AVmediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(positionChanged(qint64)));
     connect(&AVmediaPlayer, SIGNAL(durationChanged(qint64)), SLOT(durationChanged(qint64)));
@@ -142,11 +142,11 @@ void SMActionVideo::connectPlayer()
             SIGNAL(mediaStatusChanged(QtAV::MediaStatus)),
             SLOT(mediaStatusChanged(QtAV::MediaStatus)));
 }
-void SMActionVideo::disconnectPlayer()
+void SMActionVideoQtAV::disconnectPlayer()
 {
     AVmediaPlayer.disconnect(this);
 }
-void SMActionVideo::playerStop()
+void SMActionVideoQtAV::playerStop()
 {
     stop();
 
@@ -164,7 +164,7 @@ void SMActionVideo::playerStop()
         go();
     }
 }
-void SMActionVideo::playerStarted()
+void SMActionVideoQtAV::playerStarted()
 {
     setDisableStop(false);
     _emitEndOnStopped = false;
@@ -174,45 +174,45 @@ void SMActionVideo::playerStarted()
         stop();
     }
 }
-void SMActionVideo::positionChanged(qint64 position)
+void SMActionVideoQtAV::positionChanged(qint64 position)
 {qInfo() << "position " << title() << " " << position << " " << mediaDuration;
     qint64 percent = (100 * position) / mediaDuration;
     getProgressBar()->setValue((int)percent);
     if (position >= mediaDuration)
     {emit end(this);qInfo() << "END 2";}
 }
-void SMActionVideo::durationChanged(qint64 duration)
+void SMActionVideoQtAV::durationChanged(qint64 duration)
 {
     mediaDuration = duration;
 }
-void SMActionVideo::mediaStatusChanged(QtAV::MediaStatus status)
+void SMActionVideoQtAV::mediaStatusChanged(QtAV::MediaStatus status)
 {
     switch ((int)status)
     {
-    case QtAV::MediaStatus::LoadingMedia:
+    case LoadingMedia:
         //_loaded = false;
         setLoadStatus(STATUS_LOADING);
         break;
 
-    case QtAV::MediaStatus::LoadedMedia:
+    case LoadedMedia:
         setLoadStatus(STATUS_LOADED);
         if (_goOnLoad)
             go();
         break;
 
-    case QtAV::MediaStatus::BufferingMedia:
-    case QtAV::MediaStatus::BufferedMedia:
+    case BufferingMedia:
+    case BufferedMedia:
         setStatus(STATUS_PLAY);
         break;
 
-    case QtAV::MediaStatus::NoMedia:
-    case QtAV::MediaStatus::InvalidMedia:
+    case NoMedia:
+    case InvalidMedia:
         setLoadStatus(STATUS_NOTLOADED);
         setStatus(STATUS_ERROR);
         qInfo() << "ERROR!!!! " << title();
         break;
 
-    case QtAV::MediaStatus::EndOfMedia:
+    case EndOfMedia:
         if (AVmediaPlayer.duration() == 0)
             break; //is not end of media, it's stop media
         qInfo() << "EoM " << AVmediaPlayer.duration() << " " << AVmediaPlayer.position() << " " << getStatus();
@@ -228,11 +228,11 @@ void SMActionVideo::mediaStatusChanged(QtAV::MediaStatus status)
 
     //qDebug() << "Status AV: " << status << " " << title();
 }
-void SMActionVideo::setOpacity(qreal opacity)
+void SMActionVideoQtAV::setOpacity(qreal opacity)
 {
     AVideoItem->setOpacity(opacity);
 }
-void SMActionVideo::setVolume(qreal v)
+void SMActionVideoQtAV::setVolume(qreal v)
 {
     if (v > 1.0) v = 1.0;
     if (v < 0.0) v = 0.0;
@@ -240,7 +240,7 @@ void SMActionVideo::setVolume(qreal v)
     if (AVmediaPlayer.audio())
         AVmediaPlayer.audio()->setVolume(volume());
 }
-void SMActionVideo::onEnd()
+void SMActionVideoQtAV::onEnd()
 {qInfo() << "onEND" << title();
     getProgressBar()->setValue(getProgressBar()->maximum());
 
@@ -249,7 +249,7 @@ void SMActionVideo::onEnd()
 
     SMAction::onEnd();
 }
-void SMActionVideo::slotSetRepeat(void)
+void SMActionVideoQtAV::slotSetRepeat(void)
 {
     bool ok;
     int r = QInputDialog::getInt(this, tr("Repeat Action"), tr("repeat count:"),
@@ -257,7 +257,7 @@ void SMActionVideo::slotSetRepeat(void)
     if (ok)
         setRepeat(r);
 }
-void SMActionVideo::slotSetVolume(void)
+void SMActionVideoQtAV::slotSetVolume(void)
 {
     bool ok;
     qreal v = (qreal) QInputDialog::getDouble(this, tr("Set volume"), tr("Valume:"),
@@ -265,7 +265,7 @@ void SMActionVideo::slotSetVolume(void)
     if (ok)
         setVolume(v);
 }
-QDomElement SMActionVideo::createDomElement(QDomDocument& document)
+QDomElement SMActionVideoQtAV::createDomElement(QDomDocument& document)
 {
     QDomElement element = SMAction::createDomElement(document);
 
@@ -281,7 +281,7 @@ QDomElement SMActionVideo::createDomElement(QDomDocument& document)
 
     return element;
 }
-void SMActionVideo::readSettingsFromNode(QDomNode node)
+void SMActionVideoQtAV::readSettingsFromNode(QDomNode node)
 {
     SMAction::readSettingsFromNode(node);
     node = node.firstChild();
