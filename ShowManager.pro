@@ -6,7 +6,7 @@
 
 QT       += core gui multimedia xml
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia multimediawidgets opengl avwidgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia multimediawidgets opengl
 
 TARGET = ShowManager
 TEMPLATE = app
@@ -24,8 +24,7 @@ SOURCES += main.cpp\
     Action/smactionstop.cpp \
     Action/smactionopacity.cpp \
     Action/smactionwait.cpp \
-    Action/smactionvideonative.cpp \
-    Action/smactionvideo.cpp
+    Action/smactionvideonative.cpp
 
 HEADERS  += mainwindow.h\
             smapplication.h\
@@ -41,6 +40,16 @@ HEADERS  += mainwindow.h\
     Action/smactionwait.h \
     Action/smactionvideonative.h \
     Action/smactionvideo.h
+
+#CONFIG += qtav
+CONFIG(qtav) {
+    message(Video actions by qtav)
+    greaterThan(QT_MAJOR_VERSION, 4): QT += avwidgets
+    SOURCES += Action/smactionvideoqtav.cpp
+    HEADERS += Action/smactionvideoqtav.h
+} else {
+    message(Video actions by native qt multimedia)
+}
 
 FORMS    += mainwindow.ui \
     smaction.ui
