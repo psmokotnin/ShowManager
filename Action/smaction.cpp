@@ -89,7 +89,26 @@ SMView* SMAction::view(void)
 void SMAction::setGoType(int type)
 {
     _goType = type;
-    ui->gotype->setText(QString::number(getGoType()));
+
+    QPixmap p; // load pixmap
+    int w = ui->gotype->width();
+    int h = ui->gotype->height();
+    switch (getGoType())
+    {
+    case GOTYPE_NONE:
+        ui->gotype->setText("");
+        break;
+    case GOTYPE_NEXTONGO:
+        p.load("://Images/nextongo.png");
+        ui->gotype->setPixmap(p.scaled(w / 2, h / 2, Qt::KeepAspectRatio));
+        break;
+    case GOTYPE_NEXTONEND:
+        p.load("://Images/nextonend.png");
+        ui->gotype->setPixmap(p.scaled(w / 2, h / 2, Qt::KeepAspectRatio));
+        break;
+    default:
+        ui->gotype->setText(QString::number(getGoType()));
+    }
 }
 QListWidgetItem* SMAction::getListItem()
 {
@@ -118,7 +137,7 @@ void SMAction::setStatus(int status)
     case STATUS_STOP:
         qInfo() << "stopped " << getId() << " " << title();
         emit stopped(this);
-        ui->status->setText(QString::number(getStatus()));
+        ui->status->setText(" ");
         //p.load("://Images/stopAction.png");
         //ui->status->setPixmap(p.scaled(w / 2, h / 2, Qt::KeepAspectRatio));
         break;

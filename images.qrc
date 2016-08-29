@@ -1,13 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>Images/10.jpg</file>
-        <file>Images/10.png</file>
         <file>Images/3.jpg</file>
         <file>Images/3.png</file>
         <file>Images/8.jpg</file>
         <file>Images/8.png</file>
         <file>Images/9.jpg</file>
-        <file>Images/9.png</file>
         <file>Images/audioAction.jpg</file>
         <file>Images/audioAction.png</file>
         <file>Images/error.jpg</file>
@@ -20,5 +18,7 @@
         <file>Images/playAction.png</file>
         <file>Images/videoAction.jpg</file>
         <file>Images/videoAction.png</file>
+        <file>Images/nextonend.png</file>
+        <file>Images/nextongo.png</file>
     </qresource>
 </RCC>
