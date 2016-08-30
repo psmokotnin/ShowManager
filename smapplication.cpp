@@ -1,7 +1,6 @@
 #include "smapplication.h"
 #include "mainwindow.h"
 
-
 SMApplication::SMApplication(QObject *parent) : QObject(parent)
 {
     w        = new MainWindow();

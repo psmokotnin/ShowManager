@@ -42,15 +42,28 @@ HEADERS  += mainwindow.h\
     Action/smactionvideo.h
 
 #CONFIG += qtav
+CONFIG += vlc
 CONFIG(qtav) {
     message(Video actions by qtav)
     greaterThan(QT_MAJOR_VERSION, 4): QT += avwidgets
     SOURCES += Action/smactionvideoqtav.cpp
     HEADERS += Action/smactionvideoqtav.h
 } else {
+CONFIG(vlc) {
+    message(Video actions by vlc)
+    LIBS += -L"C:\Program Files (x86)\VideoLAN\VLC\sdk\lib" #if you are at windows os
+    LIBS += -L"C:\Program Files (x86)\VideoLAN\VLC" # dll
+    INCLUDEPATH += "C:\Program Files (x86)\VideoLAN\VLC\sdk\include"
+
+    SOURCES += Action/smactionvideovlc.cpp
+    HEADERS += Action/smactionvideovlc.h
+
+    unix|win32: LIBS += -llibvlc
+}
+else {
     message(Video actions by native qt multimedia)
 }
-
+}
 FORMS    += mainwindow.ui \
     smaction.ui
 

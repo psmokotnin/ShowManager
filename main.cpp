@@ -8,5 +8,4 @@ int main(int argc, char *argv[])
     SMApplication app;
     app.showWindow();
     return a.exec();
-    return 0;
 }

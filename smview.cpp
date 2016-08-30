@@ -6,7 +6,9 @@ SMView::SMView(QWidget *parent) : QGraphicsView(parent)
     setWindowFlags(Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
     setFocusPolicy(Qt::NoFocus);
 
-    setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    //fo native or qtav, not for VLC
+    //setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setScene(new QGraphicsScene(this));
 
@@ -14,6 +16,7 @@ SMView::SMView(QWidget *parent) : QGraphicsView(parent)
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 }
 
 void SMView::setScreen(int screen)

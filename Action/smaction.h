@@ -55,6 +55,9 @@ public:
     virtual void setMedia(QString fileName);
     QString media() {return fileName;}
     QUrl mediaUrl() {return QUrl::fromLocalFile(media());}
+    QByteArray mediaVLC() {
+        return fileName.replace("/", "\\").toUtf8();
+    }
 
     SMView* view(void);
 
@@ -83,6 +86,7 @@ protected:
     void setStatus(int status);
     void setLoadStatus(int loadStatus) {_loadStatus = loadStatus;}
     virtual void setView(SMView* view);
+    SMView* getView() {return _view;}
     void preGo();
 
     SMActionList* getActionList() {return actionList;}
