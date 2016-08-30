@@ -193,5 +193,5 @@ void SMActionVideoVLC::setVolume(qreal v)
     if (v > 1.0) v = 1.0;
     if (v < 0.0) v = 0.0;
     _volume = v;
-    qWarning() << "TODO";
+    libvlc_audio_set_volume(_mp, _volume*100);
 }
