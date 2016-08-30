@@ -1,7 +1,7 @@
 /**
   * Action video on libvlc
   *
-  * ADD: end event, volume, opacity
+  * ADD: end event, opacity
   *
   */
 #include "smactionvideovlc.h"
@@ -54,7 +54,7 @@ void SMActionVideoVLC::load(int time)
     if (!isLoaded())
     {
         SMAction::load(time);qInfo() << mediaVLC();
-        _m = libvlc_media_new_path(_vlcinstance, mediaVLC());//"C:\\EmotionsVideo\\1.mp4");//mediaUTF8());qInfo() << _m;
+        _m = libvlc_media_new_path(_vlcinstance, mediaVLC());
         if (!_m)
         {
             setStatus(STATUS_ERROR);
@@ -78,7 +78,6 @@ void SMActionVideoVLC::go()
         /* Get our media instance to use our window */
 #if defined(Q_OS_WIN)
         libvlc_media_player_set_hwnd(_mp, (void*)getView()->winId());
-        //libvlc_media_player_set_drawable(_mp, reinterpret_cast<unsigned int>(getView()->winId()));// _videoWidget->winId()));
 #elif defined(Q_OS_MAC)
 //        libvlc_media_player_set_drawable(_mp, getView()->winId()));//_videoWidget->winId());
 #else //Linux
